@@ -1,44 +1,63 @@
-#include<bits/stdc++.h>
-using namespace std;
+#include <bits/stdc++.h>
+#define f first
+#define s second
 #define ll long long
-const int mxN=1e5, MOD=1e9+7;
-int n, m, a[mxN+1];
-ll dp[mxN+1][101], ans=0;
-int main()
-{
-    cin >> n >> m;
-    for(int i=1;i<=n;i++){
-        cin >> a[i];
+#define pii pair<int, int>
+using namespace std;
+vector<pii> v;
+ll cnt[4]; // 2 3 5 7 (prime arr that <= x)
+int main() {
+    ios_base::sync_with_stdio(0); cin.tie(0);
+    // freopen("input.txt", "r", stdin);
+
+    int n, m;
+    cin >> m >> n;
+    int x, s, t;
+    for (int i = 1; i <= m; i++) {
+        cin >> x >> s >> t;
+        v.push_back({s, x});
+        v.push_back({t+1, -x});
     }
-    if(a[1]){
-        dp[1][a[1]]=1;
-    } else {
-        for(int i=1;i<=m;i++)
-            dp[1][i]=1;
-    }
-    for(int i=2;i<=n;i++){
-        for(int j=1;j<=m;j++){
-            dp[i][j]=dp[i-1][j];
-            if(j!=1)
-                dp[i][j]+=dp[i-1][j-1];
-            if(j!=m)
-                dp[i][j]+=dp[i-1][j+1];
-        }
-        if(a[i]){
-            for(int j=0;j<=m;j++){
-                if(j!=a[i])
-                    dp[i][j]=0;
+    sort(v.begin(), v.end());
+    ll num = 1, ans1 = 0, ans2 = 0;
+    for (int i = 0; i < v.size(); i++) {
+        if (v[i].s > 0) {
+            num *= v[i].s;
+            switch (v[i].s) {
+                case  2: cnt[0] += 1; break;
+                case  3: cnt[1] += 1; break;
+                case  4: cnt[0] += 2; break;
+                case  5: cnt[2] += 1; break;
+                case  6: cnt[0] += 1; cnt[1] += 1; break;
+                case  7: cnt[3] += 1; break;
+                case  8: cnt[0] += 3; break;
+                case  9: cnt[1] += 2; break;
+                case 10: cnt[0] += 1; cnt[2] += 1; break;
+            }
+            num = 1;
+            for (int i = 0; i < 4; i++) num *= (1 + cnt[i]);
+            if (num > ans1) {
+                ans1 = num;
+                ans2 = v[i+1].f - v[i].f;
+            } else if (num == ans1) {
+                ans2 += v[i+1].f - v[i].f;
+            }
+        } else {
+            num /= (-v[i].s);
+            switch (-v[i].s) {
+                case  2: cnt[0] -= 1; break;
+                case  3: cnt[1] -= 1; break;
+                case  4: cnt[0] -= 2; break;
+                case  5: cnt[2] -= 1; break;
+                case  6: cnt[0] -= 1; cnt[1] -= 1; break;
+                case  7: cnt[3] -= 1; break;
+                case  8: cnt[0] -= 3; break;
+                case  9: cnt[1] -= 2; break;
+                case 10: cnt[0] -= 1; cnt[2] -= 1; break;
             }
         }
     }
-    for(int i=1;i<=n;i++){
-        for(int j=0;j<=m;j++){
-            cout << dp[i][j] << " ";
-        }
-        cout << endl;
-    }
-    for(int i=1;i<=m;i++)
-        ans=(ans+dp[n][i])%MOD;
-    cout << ans;
+    cout << ans1 << " " << ans2;
+
     return 0;
 }
